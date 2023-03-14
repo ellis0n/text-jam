@@ -1,15 +1,11 @@
+import vendor
 import vendors
 from input import system as sys
-
+from gamestate import GameState
 print("\nfarmer's market manager simulator")
 
-tables = 3
-# Vendor pool
-booked = {}
-
 # Main menu
-
-def mainmenu():
+def main_menu():
     print("\nmain menu\n")
     print("1: start game \n2: explain  \n3: quit ")
     choice = input("\n> ").lower()
@@ -20,59 +16,17 @@ def mainmenu():
         print("\nyou are the manager of a farmer's market")
         print("\nyou need to keep the market running smoothly")
         print("\ntype HELP at any time to for a list of commands")
-        mainmenu()
-    elif choice == "3" or choice == "three" or choice == "q" or choice == "quit":
+        main_menu()
+    elif choice == "3" or choice == "three":
         exit()
     else:
-        mainmenu()
+        main_menu()
 
-
-# Start week cycle
-def week(current):
-    reference = {0: {
-        "name": "sunday",
-        "event": "none",
-    }, 1: {
-        "name": "monday",
-        "event": "none",
-    }, 2: {
-        "name": "tuesday",
-        "event": "none",
-    }, 3: {
-        "name": "wednesday",
-        "event": "none",
-    }, 4: {
-        "name": "thursday",
-        "event": "none",
-    }, 5: {
-        "name": "friday",
-        "event": "none",
-    }, 6: {
-        "name": "saturday",
-        "event": "none",
-    }}
-
-    name = reference[current]["name"]
-    event = reference[current]["event"]
-
-    for i in range(7):
-        dayCycle(name, event)
-        current += 1
-        # market function
-        if current == 6:
-            print("Market day")
-        if current == 7:
-            break
-        name = reference[current]["name"]
-        event = reference[current]["event"]
-
-    print("week over")
 
 
 # Day cycle
-def dayCycle(name, event):
+def day_cycle():
     while True:
-        print("\nits " + name + ".")
         print("what would you like to do?\n")
         print("1: view vendor database")
         print("2: view current bookings")
@@ -87,21 +41,57 @@ def dayCycle(name, event):
         elif choice == "3":
             vendors.book()
         elif choice == "4":
-            print("you wrapped up for the day.")
-            break
+            return
         else:
             print("invalid selection")
 
 # Game loop
 def game():
-    weeks = 1
-    day = 1
+    state = GameState(1, 1, vendor.VendorPool(10), vendor.VendorPool(5))
+    week = state.week
+    day = state.day
+    vendor_pool = state.vendor_pool
+    booked_pool = state.booked
+
+    print(day)
+    print(week)
+    # print(vendor_pool)
+    # print(booked_pool)
+
+    # Initialize vendors
+
+    def market_day():
+        print("market day!")
+        print("code goes here \n")
+        input("press enter to continue \n")
+
+
+    def day_off():
+        print("day off!")
+        print("code goes here \n")
+        input("press enter to continue \n")
 
     # Main loop
+    # Main loop
     while True:
-        print("\nWEEK " + str(weeks))
-        week(day)
-        weeks += 1
+        if day == 8:
+            state.increment_week()
+            week = state.week
+            day = 1
+        elif day == 6:
+            print("\nweek: " + str(week) + " day: " + str(day))
+            market_day()
+            state.increment_day()
+            day = state.day
+        elif day == 7:
+            print("\nweek: " + str(week) + " day: " + str(day))
+            day_off()
+            state.increment_day()
+            day = state.day
+        else:
+            print("week: " + str(week) + " day: " + str(day))
+            day_cycle()
+            state.increment_day()
+            day = state.day
 
-
-mainmenu()
+main_menu()
