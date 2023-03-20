@@ -1,97 +1,101 @@
-import vendor
-import vendors
-from input import system as sys
-from gamestate import GameState
+from Vendors import vendorpool, vendor
+
+from Util.input import system as sys
+from Util.gamestate import GameState
+from Util.computer import Computer
+
 print("\nfarmer's market manager simulator")
+
 
 # Main menu
 def main_menu():
-    print("\nmain menu\n")
-    print("1: start game \n2: explain  \n3: quit ")
+    print("-" * 20)
+    print("\nmain menu")
+    print(("=" * 20) + "\n")
+
+    print("1: start game \n2: the other option  \n3: quit ")
     choice = input("\n> ").lower()
     sys(choice)
-    if choice == "1" or choice == "start" or choice == "one":
+    if choice == "1":
         game()
-    elif choice == "2" or choice == "two" or choice == "e" or choice == "explain":
-        print("\nyou are the manager of a farmer's market")
-        print("\nyou need to keep the market running smoothly")
-        print("\ntype HELP at any time to for a list of commands")
+    elif choice == "2":
+        print("\ni dont know what im doing! this is for text-jam 2023")
+        print("i'll probably put something here later ")
         main_menu()
-    elif choice == "3" or choice == "three":
+    elif choice == "3":
         exit()
     else:
         main_menu()
 
 
-
 # Day cycle
-def day_cycle():
+def day_cycle(computer):
     while True:
-        print("what would you like to do?\n")
-        print("1: view vendor database")
-        print("2: view current bookings")
-        print("3: book a vendor")
-        print("4: wrap up for the day")
-        choice = input("> ")
+        print("\nwhat do you do?\n")
+        print("1. open myMarket \n2: use computer \n3: talk to the boss \n4: wrap up for the day")
+        choice = input("\n> ")
         sys(choice)
+
         if choice == "1":
-            vendors.menu()
+            computer.open_my_market()
         elif choice == "2":
-            vendors.booked()
+            print("\nyou sit down at your computer. ")
+            computer.run()
         elif choice == "3":
-            vendors.book()
+            print("\nyour boss is not here yet.")
         elif choice == "4":
             return
         else:
             print("invalid selection")
 
+def day_one():
+    print("\nwelcome to your new job!")
+    print("you are the manager of a farmer's market")
+    print("you need to keep the market running smoothly")
+    print("you have five days to get ready for the first market day")
+    print("use the myMarket app to prepare")
+    print("you can also talk to your boss to get advice (soon)")
+    print("type HELP any time to see a list of commands")
+    print("good luck!\n")
+
+    starter_vendors = vendorpool.VendorPool(5)
+    starter_vendors.add_vendor(vendor.Vendor("bob", "bob's farm", "farmer"))
+    starter_vendors.add_vendor(vendor.Vendor("sally", "sally's bakery", "craft"))
+    starter_vendors.add_vendor(vendor.Vendor("joe", "ripple creek", "farmer"))
+    starter_vendors.add_vendor(vendor.Vendor("sue", "sue's shwarma", "food"))
+    starter_vendors.add_vendor(vendor.Vendor("donnie", "donnie's wooden wonders", "craft"))
+    return starter_vendors
+
+def market_day():
+    print("\nmarket day!")
+    # TODO: implement an actual fun gameplay mechanic LOL
+
 # Game loop
 def game():
-    state = GameState(1, 1, vendor.VendorPool(10), vendor.VendorPool(5))
-    week = state.week
-    day = state.day
-    vendor_pool = state.vendor_pool
-    booked_pool = state.booked
+    state = GameState(1, 1, vendorpool.VendorPool(5), vendorpool.VendorPool(0))
+    computer = Computer(state)
 
-    print(day)
-    print(week)
-    # print(vendor_pool)
-    # print(booked_pool)
-
-    # Initialize vendors
-
-    def market_day():
-        print("market day!")
-        print("code goes here \n")
-        input("press enter to continue \n")
-
-
-    def day_off():
-        print("day off!")
-        print("code goes here \n")
-        input("press enter to continue \n")
-
-    # Main loop
     # Main loop
     while True:
-        if day == 8:
+        if state.day == 8:
+            state.get_week_and_day()
             state.increment_week()
-            week = state.week
-            day = 1
-        elif day == 6:
-            print("\nweek: " + str(week) + " day: " + str(day))
+        elif state.day == 6:
+            state.get_week_and_day()
             market_day()
             state.increment_day()
             day = state.day
-        elif day == 7:
-            print("\nweek: " + str(week) + " day: " + str(day))
-            day_off()
+        elif state.day == 7:
+            print("\nweek: " + str(state.week) + " day: " + str(state.day))
+            print("nothing happens on sunday. \n")
             state.increment_day()
-            day = state.day
         else:
-            print("week: " + str(week) + " day: " + str(day))
-            day_cycle()
+            state.get_week_and_day()
+            if state.day == 1 & state.week == 1:
+                state.vendor_pool = day_one()
+            day_cycle(computer)
             state.increment_day()
-            day = state.day
 
-main_menu()
+
+if __name__ == "__main__":
+    main_menu()
