@@ -91,7 +91,7 @@ def game():
             state.increment_day()
         else:
             state.get_week_and_day()
-            if state.day == 1 & state.week == 1:
+            if state.day == 1 and state.week == 1:
                 state.vendor_pool = day_one()
             day_cycle(computer)
             state.increment_day()
