@@ -131,24 +131,28 @@ class Computer:
         if choice == "1":
             print("\navailable vendors")
             print("\n" + ("=" * 20) + "\n")
-            for i, vendor in enumerate(self.state.vendor_pool.vendors):
-                if not vendor.booked:
-                    print(f"{i+1}. {vendor.get_stats()}")
-            print("\n" + ("=" * 20) + "\n")
+            available_vendors = [vendor for vendor in self.state.vendor_pool.vendors if not vendor.booked]
+            for i, vendor in enumerate(available_vendors):
+                print(f"{i + 1}. {vendor.get_stats()}")
             while True:
                 choice = input("select vendor: ")
                 sys(choice)
-                index = int(choice)
-                if index > len(self.state.vendor_pool.vendors) or index < 1 or not choice.isdigit() or choice == "":
+                if not choice.isdigit() or choice == "":
                     print("invalid selection")
-                vendor = self.state.vendor_pool.vendors[index-1]
+                    continue
+                index = int(choice)
+                if index > len(available_vendors) or index < 1:
+                    print("invalid selection")
+                    continue
+                vendor = available_vendors[index - 1]
                 if not vendor.booked:
                     self.state.bookings.add_vendor(vendor)
-                    self.state.vendor_pool.vendors[index].booked = True
+                    vendor.booked = True
                     print("vendor booked")
                     break
                 else:
                     print("vendor already booked")
+
 
         elif choice == "2":
             choice = input("enter vendor name: ")
